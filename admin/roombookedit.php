@@ -229,8 +229,16 @@ if (isset($_POST['guestdetailedit'])) {
                 </div>
             </div>
             <div class="footer">
-                <button class="btn btn-success" name="guestdetailedit">Edit</button>
-            </div>
+    <?php if ($stat != 'Checked out'): ?>
+        <button class="btn btn-success" name="guestdetailedit">Update Changes</button>
+        
+        <button type="submit" class="btn btn-danger" name="checkout" onclick="return confirm('Finalize check-out? This will set the room to Maintenance.')">
+            Checkout
+        </button>
+    <?php else: ?>
+        <button class="btn btn-secondary" disabled>Record Locked</button>
+    <?php endif; ?>
+</div>
         </form>
     </div>
 </body>
