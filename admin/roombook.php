@@ -56,8 +56,7 @@ include '../config.php';
                         <option value selected disabled>Type Of Room</option>
                         <option value="Superior Room">SUPERIOR ROOM</option>
                         <option value="Deluxe Room">DELUXE ROOM</option>
-                        <option value="Guest House">GUEST HOUSE</option>
-                        <option value="Single Room">SINGLE ROOM</option>
+                        
                     </select>
 
                     <select name="Bed" id="Bed" class="selectinput" required>
@@ -68,13 +67,7 @@ include '../config.php';
                         <option value selected disabled>Select Room No</option>
                     </select>
 
-                    <select name="Meal" class="selectinput" required>
-                        <option value selected disabled>Meal</option>
-                        <option value="Room only">Room only</option>
-                        <option value="Breakfast">Breakfast</option>
-                        <option value="Half Board">Half Board</option>
-                        <option value="Full Board">Full Board</option>
-                    </select>
+                    
                     <div class="datesection">
                         <span>
                             <label for="cin"> Check-In</label>
@@ -101,7 +94,6 @@ include '../config.php';
             $RoomType = $_POST['RoomType'];
             $Bed = $_POST['Bed'];
             $NoofRoom = $_POST['NoofRoom'];
-            $Meal = $_POST['Meal'];
             $cin = $_POST['cin'];
             $cout = $_POST['cout'];
 
@@ -109,8 +101,13 @@ include '../config.php';
                 echo "<script>swal({title: 'Fill the proper details', icon: 'error'});</script>";
             } else {
                 $sta = "NotConfirm";
-                $sql = "INSERT INTO roombook(Name,Email,Country,Phone,RoomType,Bed,NoofRoom,Meal,cin,cout,stat,nodays) 
-                        VALUES ('$Name','$Email','$Country','$Phone','$RoomType','$Bed','$NoofRoom','$Meal','$cin','$cout','$sta',datediff('$cout','$cin'))";
+                // Usba ang imong INSERT SQL:
+$sql = "INSERT INTO roombook(Name,Email,Country,Phone,RoomType,Bed,NoofRoom,cin,cout,stat,nodays) 
+        VALUES ('$Name','$Email','$Country','$Phone','$RoomType','$Bed','$NoofRoom','$cin','$cout','$sta', 
+        CASE 
+            WHEN DATEDIFF('$cout','$cin') = 0 THEN 1 
+            ELSE DATEDIFF('$cout','$cin') 
+        END)";
                 $result = mysqli_query($conn, $sql);
 
                 if ($result) {
@@ -147,7 +144,6 @@ include '../config.php';
                     <th scope="col">Type of Room</th>
                     <th scope="col">Type of Bed</th>
                     <th scope="col">Room No</th>
-                    <th scope="col">Meal</th>
                     <th scope="col">Check-In</th>
                     <th scope="col">Check-Out</th>
                     <th scope="col">No of Day</th>
@@ -170,7 +166,6 @@ include '../config.php';
                         <td><?php echo $res['RoomType'] ?></td>
                         <td><?php echo $res['Bed'] ?></td>
                         <td><?php echo $res['NoofRoom'] ?></td>
-                        <td><?php echo $res['Meal'] ?></td>
                         <td><?php echo $res['cin'] ?></td>
                         <td><?php echo $res['cout'] ?></td>
                         <td><?php echo $res['nodays'] ?></td>
