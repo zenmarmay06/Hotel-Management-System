@@ -145,5 +145,11 @@ Morris.Bar({
  ]
 });
 </script>
+<script>
+    // Mo-refresh ang page matag 5 ka segundo
+    setTimeout(function(){
+       location.reload();
+    }, 5000); 
+</script>
 
 </html>
