@@ -204,27 +204,50 @@ $sql = "INSERT INTO roombook(Name,Email,Country,Phone,RoomType,Bed,NoofRoom,cin,
     </div>
 
     <script>
-        function fetchDetails(roomType) {
-            if (roomType == "") {
-                $('#Bed').html('<option value="">Select Bedding Type</option>');
-                $('#NoofRoom').html('<option value="">Select Room No</option>');
-                return;
-            }
-
-            $.ajax({
-                url: 'fetch_room_details.php', // Kinahanglan buhaton ni nimo nga file
-                method: 'POST',
-                data: {
-                    room_type: roomType
-                },
-                dataType: 'JSON',
-                success: function(data) {
-                    $('#Bed').html(data.beds);
-                    $('#NoofRoom').html(data.rooms);
-                }
-            });
+    // Step 1: Inig pili sa Room Type, i-load ang Bed types
+    function fetchDetails(roomType) {
+        if (roomType == "") {
+            $('#Bed').html('<option value="">Select Bedding Type</option>');
+            $('#NoofRoom').html('<option value="">Select Room No</option>');
+            return;
         }
-    </script>
+
+        $.ajax({
+            url: 'fetch_room_details.php',
+            method: 'POST',
+            data: { room_type: roomType },
+            dataType: 'JSON',
+            success: function(data) {
+                $('#Bed').html(data.beds);
+                // I-reset ang Room No dropdown
+                $('#NoofRoom').html('<option value="" selected disabled>Select Room No</option>');
+            }
+        });
+    }
+
+    // Step 2: Inig pili sa Bed Type, i-load ang Room Numbers nga match sa napili
+    $(document).ready(function() {
+        $('#Bed').on('change', function() {
+            var roomType = $('#RoomType').val();
+            var bedType = $(this).val();
+
+            if (roomType != "" && bedType != "") {
+                $.ajax({
+                    url: 'fetch_room_details.php',
+                    method: 'POST',
+                    data: { 
+                        room_type: roomType, 
+                        bed_type: bedType 
+                    },
+                    dataType: 'JSON',
+                    success: function(data) {
+                        $('#NoofRoom').html(data.rooms);
+                    }
+                });
+            }
+        });
+    });
+</script>
 </body>
 <script src="./javascript/roombook.js"></script>
 
