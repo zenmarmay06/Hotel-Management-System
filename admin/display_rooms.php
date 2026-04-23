@@ -30,7 +30,7 @@ while ($row = mysqli_fetch_array($re)) {
     if ($type == "Superior Room") $roombox_class = "roomboxsuperior";
     else if ($type == "Deluxe Room") $roombox_class = "roomboxdelux";
     
-    else if ($type == "Single Room") $roombox_class = "roomboxsingle";
+   
 
     // Pagpili sa color badge base sa real-time status
     $badge_class = "bg-available"; 
@@ -55,9 +55,7 @@ while ($row = mysqli_fetch_array($re)) {
                 <div class='mt-2'>";
                 
     // Button para sa paglimpyo (mopakita ra kung Maintenance status)
-    if($status == "Maintenance") {
-        echo "<a href='room.php?clean_id=". $row['id'] ."'><button class='btn btn-warning btn-sm me-1'>Mark Cleaned</button></a>";
-    }
+    
 
     echo "      <a href='roomdelete.php?id=". $row['id'] ."'><button class='btn btn-danger btn-sm'>Delete</button></a>
                 </div>

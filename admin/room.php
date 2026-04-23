@@ -38,7 +38,23 @@ if(isset($_GET['clean_id'])) {
         .bg-available { background-color: #28a745 !important; color: white !important; }
         .bg-occupied { background-color: #dc3545 !important; color: white !important; }
         .bg-maintenance { background-color: #ffc107 !important; color: #000 !important; }
+        .status-badge { 
+        display: inline-block; 
+        /* Gikuha ang width: 85% para dili ma-compress ang text */
+        padding: 8px 25px; /* Gidugangan ang padding sa kilid (left & right) para hayahay ang text */
+        border-radius: 50px; 
+        font-size: 0.9rem; 
+        font-weight: 800; 
+        text-align: center; 
+        text-transform: uppercase; 
+        letter-spacing: 1px; 
+        margin-bottom: 20px; 
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         
+        /* Mao ni ang solusyon: */
+        min-width: 150px; /* Siguradong naay minimum width pero mo-expand kung taas ang text */
+        white-space: nowrap; /* Pugngan ang text nga mo-wrap o mobalhin sa ubos */
+    }
         /* Style para sa Price display */
         .room-price {
             font-size: 1.4rem;
