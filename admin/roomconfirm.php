@@ -1,8 +1,19 @@
 <?php
-
 include '../config.php';
 
 $id = $_GET['id'];
+
+// --- MESSAGE FOR CONFIRMATION ---
+if (!isset($_GET['confirm'])) {
+    echo "<script>
+            if (confirm('Are you sure you want to CONFIRM this booking?')) {
+                window.location.href = 'roomconfirm.php?id=$id&confirm=true';
+            } else {
+                window.location.href = 'roombook.php';
+            }
+          </script>";
+    exit();
+}
 
 $sql ="Select * from roombook where id = '$id'";
 $re = mysqli_query($conn,$sql);
@@ -14,8 +25,7 @@ while($row=mysqli_fetch_array($re))
     $Phone = $row['Phone'];
     $RoomType = $row['RoomType'];
     $Bed = $row['Bed'];
-    $NoofRoom = $row['NoofRoom']; // Kini ang Room Number
-    $Meal = $row['Meal'];
+    $NoofRoom = $row['NoofRoom']; 
     $cin = $row['cin'];
     $cout = $row['cout'];
     $noofday = $row['nodays'];
@@ -32,42 +42,40 @@ if($stat == "NotConfirm")
 
     if($result){
         
-        // --- BAG-O: AUTOMATIC OCCUPIED LOGIC ---
-        // I-update ang status sa room table gamit ang room number ($NoofRoom)
+        // 2. AUTOMATIC OCCUPIED LOGIC
         $sql_room = "UPDATE room SET status = 'Occupied' WHERE room_no = '$NoofRoom'";
         mysqli_query($conn, $sql_room);
-        // ----------------------------------------
 
-        $type_of_room = 0;      
-        if($RoomType=="Superior Room") { $type_of_room = 3000; }
-        else if($RoomType=="Deluxe Room") { $type_of_room = 2000; }
-        else if($RoomType=="Guest House") { $type_of_room = 1500; }
-        else if($RoomType=="Single Room") { $type_of_room = 1000; }
+        // --- PRICING LOGIC (ROOM & BED ONLY) ---
+        $price = 0;
+        if ($RoomType == "Superior Room") {
+            if ($Bed == "Single") $price = 1000;
+            else if ($Bed == "Double") $price = 2000;
+            else if ($Bed == "Triple") $price = 2500;
+            else if ($Bed == "Quad") $price = 3000;
+        } 
+        else if ($RoomType == "Deluxe Room") {
+            if ($Bed == "Single") $price = 4000;
+            else if ($Bed == "Double") $price = 4800;
+            else if ($Bed == "Triple") $price = 4900;
+            else if ($Bed == "Quad") $price = 5000;
+        } 
+
+        // --- CALCULATION: (Price x No of Days) ---
+        $ttot = $price * $noofday; // Total Room Charge
         
-        $type_of_bed = 0;
-        if($Bed=="Single") { $type_of_bed = $type_of_room * 1/100; }
-        else if($Bed=="Double") { $type_of_bed = $type_of_room * 2/100; }
-        else if($Bed=="Triple") { $type_of_bed = $type_of_bed = $type_of_room * 3/100; }
-        else if($Bed=="Quad") { $type_of_bed = $type_of_room * 4/100; }
-        else if($Bed=="None") { $type_of_bed = $type_of_room * 0/100; }
+        $fintot = $ttot;           // Final total is just the room total
 
-        $type_of_meal = 0;
-        if($Meal=="Room only") { $type_of_meal=$type_of_bed * 0; }
-        else if($Meal=="Breakfast") { $type_of_meal=$type_of_bed * 2; }
-        else if($Meal=="Half Board") { $type_of_meal=$type_of_bed * 3; }
-        else if($Meal=="Full Board") { $type_of_meal=$type_of_bed * 4; }
-                                                                    
-        $ttot = $type_of_room * $noofday * 1; // Gi-multiply sa 1 room quantity
-        $mepr = $type_of_meal * $noofday;
-        $btot = $type_of_bed * $noofday;
+        // 3. INSERT INTO PAYMENT
+        // Note: Gi-maintain nako ang columns para dili mag-error ang database structure nimo
+        $psql = "INSERT INTO payment(id,Name,Email,RoomType,Bed,NoofRoom,cin,cout,noofdays,roomtotal,bedtotal,meal,mealtotal,finaltotal) 
+                 VALUES ('$id', '$Name', '$Email', '$RoomType', '$Bed', '$NoofRoom', '$cin', '$cout', '$noofday', '$ttot', '$btot', '$meal_type', '$mepr', '$fintot')";
 
-        $fintot = $ttot + $mepr + $btot;
-
-        $psql = "INSERT INTO payment(id,Name,Email,RoomType,Bed,NoofRoom,cin,cout,noofdays,roomtotal,bedtotal,meal,mealtotal,finaltotal) VALUES ('$id', '$Name', '$Email', '$RoomType', '$Bed', '$NoofRoom', '$cin', '$cout', '$noofday', '$ttot', '$btot', '$Meal', '$mepr', '$fintot')";
-
-        mysqli_query($conn,$psql);
-
-        header("Location:roombook.php");
+        if(mysqli_query($conn, $psql)){
+             header("Location:roombook.php");
+        } else {
+             echo "Error: " . mysqli_error($conn);
+        }
     }
 }
 ?>
