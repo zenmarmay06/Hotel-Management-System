@@ -69,7 +69,7 @@ switch ($resource) {
             $data = json_decode(file_get_contents("php://input"), true);
             $stmt = $pdo->prepare("
                 INSERT INTO tasks (RoomNo, Priority, AssignedTo, DueDate, Status,Note)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?)
             ");
             $stmt->execute([
                 $data['roomNo'], $data['priority'], $data['assignedTo'],
